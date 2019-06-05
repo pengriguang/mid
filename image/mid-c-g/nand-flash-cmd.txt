@@ -1,0 +1,44 @@
+nand erase.chip
+
+
+echo "Flashing uboot"
+export part_uboot=0
+flash_erase /dev/mtd${part_uboot} 0 0 && kobs-ng init -x -v u-boot.imx  
+
+export part_uboot=0
+flash_eraseall /dev/mtd${part_uboot}  && kobs-ng init -x -v u-boot.imx  
+
+
+export part_uboot=0
+flash_eraseall /dev/mtd${part_uboot} 
+
+echo "Flashing kernel"
+export part_kernel=2
+flash_eraseall /dev/mtd${part_kernel} && nandwrite -p /dev/mtd${part_kernel} -p zImage
+
+echo "Flashing dtb"
+export part_dtb=3
+flash_eraseall /dev/mtd${part_dtb}  && nandwrite -p /dev/mtd${part_dtb} -p mid7c-g.dtb
+
+echo "Flashing Logo"
+export part_logo=4
+flash_eraseall /dev/mtd${part_logo} && nandwrite -p /dev/mtd${part_logo} -p logo-1024-768.bmp 
+
+echo "Flashing rootfs"
+export part_rootfs=5
+ flash_eraseall -j /dev/mtd${part_rootfs}
+
+//ubiformat /dev/mtd${part_rootfs}
+
+ubiattach /dev/ubi_ctrl -m ${part_rootfs}
+
+ubimkvol /dev/ubi0 -N rootfs -m ${part_rootfs}
+
+mkdir -p /run/media/mtd${part_rootfs} \
+ && mount -t ubifs ubi0:rootfs /run/media/mtd${part_rootfs}
+
+cd /media/sda1
+tar vxf rootfs.tar.bz2 -C /run/media/mtd${part_rootfs}
+
+sync && sync && sync
+umount /run/media/mtd${part_rootfs}
