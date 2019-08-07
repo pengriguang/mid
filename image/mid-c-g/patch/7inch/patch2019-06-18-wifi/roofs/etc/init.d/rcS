@@ -1,0 +1,157 @@
+#! /bin/sh
+/bin/mount -n -t ramfs ramfs /var
+
+/bin/mount -n -t ramfs ramfs /tmp
+
+/bin/mount -n -t sysfs none /sys
+
+/bin/mount -n -t ramfs none /dev
+
+/bin/mount -t devtmpfs devtmpfs /dev -o size=64k,mode=755
+
+/bin/mkdir /var/tmp
+
+/bin/mkdir /var/modules
+
+/bin/mkdir /var/run
+
+/bin/mkdir /var/log
+
+/bin/mkdir /var/ftpd
+
+#telnet服务需要
+/bin/mkdir -p /dev/pts                    
+
+#telnet服务需要
+/bin/mkdir -p /dev/shm  
+
+/bin/mount -t devpts devpts /dev/pts
+
+/bin/mount -a
+
+/bin/mount -o rw,remount /
+
+#USB自动挂载需要                
+if [ -e /proc/sys/kernel/hotplug ]; then
+	echo "/sbin/mdev" > /proc/sys/kernel/hotplug
+fi
+ 
+
+#启动mdev在/dev下自动创建设备文件节点
+/sbin/mdev -s        
+
+inetd   #或者telnet /bin/ash
+
+#export TZ=UTC-08:00
+
+#ts configuration                                                                                                     
+export TSLIB_TSEVENTTYPE='INPUT'                                                         
+export TSLIB_CALIBFILE='/etc/pointercal'                                                 
+export TSLIB_CONFFILE='/etc/ts.conf'                                                     
+export TSLIB_CONSOLEDEVICE='none'                                                        
+export TSLIB_FBDEVICE='/dev/fb0'                                                         
+export TSLIB_PLUGINDIR='/usr/lib/qt_lib/ts'  
+export TSLIB_TSDEVICE='/dev/input/event1'     	
+
+#qt configuration  
+export LD_LIBRARY_PATH=/usr/lib/qt_lib:$LD_LIBRARY_PATH	
+export QT_QWS_FONTDIR='/usr/lib/qt_lib/fonts'                                                   
+export QT_PLUGIN_PATH='/usr/lib/qt_lib/plugins/' 
+export QWS_DISPLAY='linuxfb:mmWidth50:mmHeight130:0'                                     
+#export QWS_SIZE=1024x600
+#export QWS_DISPLAY=Transformed:Rot90   
+                     
+#export QWS_MOUSE_PROTO=tslib:/dev/input/event0 mouseman:/dev/input/mice'
+export QWS_MOUSE_PROTO='tslib:/dev/input/event1'  
+
+/sbin/ifconfig eth0 192.168.1.100
+/sbin/ifconfig eth0 netmask 255.255.255.0
+
+#pwm config
+cd /sys/class/pwm/pwmchip0
+echo 0 > export
+cd pwm0
+echo 1 > enable
+
+cd /sys/class/pwm/pwmchip1
+echo 0 > export
+cd pwm0
+echo 1 > enable
+
+cd /sys/class/pwm/pwmchip2
+echo 0 > export
+cd pwm0
+echo 1 > enable
+
+cd /sys/class/pwm/pwmchip3
+echo 0 > export
+cd pwm0
+echo 1 > enable
+
+cd /sys/class/pwm/pwmchip4
+echo 0 > export
+cd pwm0
+echo 1 > enable
+
+cd /sys/class/pwm/pwmchip5
+echo 0 > export
+cd pwm0
+echo 1 > enable
+
+cd /sys/class/pwm/pwmchip6
+echo 0 > export
+cd pwm0
+echo 1 > enable
+
+#mc20 configuration, update
+#cd /userapp/                                                             
+#./mid7000d &
+#sleep 1
+
+#codesys configuration
+cd /userapp/codesysctrl/
+./codesyscontrol &
+
+#gprs power on
+cd /sys/class/gpio/
+echo 53 > export
+cd gpio53/
+echo out > direction 
+
+#reset gprs
+cd /sys/class/gpio/
+echo 136 > export
+cd gpio136/
+echo out > direction
+
+cd 
+    
+#load config, update ip address, wifi name and wifi passwd here
+sh /etc/config/loadconfig.sh  
+
+#can configuration
+#ifconfig can0 down	
+#canconfig can0 bitrate 250000
+#canconfig can0 ctrlmode loopback off
+#canconfig can0 start  
+
+#ifconfig can1 down	
+#canconfig can1 bitrate 250000
+#canconfig can1 ctrlmode loopback off
+#canconfig can1 start
+
+
+#wifi used for station
+#wpa_supplicant -d -Dwext -iwlan0 -B -c /etc/wpa_supplicant/wpa_supplicant.conf
+#ifconfig wlan0 192.168.43.10 up
+#route add default gw 192.168.43.1
+
+#wifi used for AP
+hostapd -B /etc/hostapd.conf
+ifconfig wlan0 192.168.2.253 up
+udhcpd /etc/udhcpd.conf
+
+
+
+
+
