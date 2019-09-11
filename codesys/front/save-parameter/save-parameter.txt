@@ -1,0 +1,8 @@
+root
+cyber7001
+
+
+cd  /userapp/PlcLogic/
+ls
+cat  mic_dint.txt
+rm   -rf  mic_dint.txt
