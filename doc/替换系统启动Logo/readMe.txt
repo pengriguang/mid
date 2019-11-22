@@ -2,7 +2,8 @@
 1. 在PC的电脑桌面上新建updatLogo目录，将升级文件startUpLogo.bmp和zImage拷贝到这个目录；
 2. 以管理员权限打开PC上的tftpd32.exe，如果弹出防火墙提示，需要点击接受访问网络，然后点击浏览按钮，浏览到刚才新建的文件夹；
 3. 通过SecureCRT网络工具软件，Telnet到192.168.1.100的显示屏，并且root用户登录；
-4. 然后运行如下命令：
+4. 这两个工具可从 https://github.com/pengriguang/mid/tree/master/tools/update  下载
+5. 然后运行如下命令：
 	a. 下载startUpLogo.bmp和zImage到显示屏，假设PC的IP地址为192.168.1.200
 	cd 
 	tftp  -gr  startUpLogo.bmp 192.168.1.200
