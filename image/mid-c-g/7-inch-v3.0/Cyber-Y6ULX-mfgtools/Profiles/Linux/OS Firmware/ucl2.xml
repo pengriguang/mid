@@ -80,10 +80,16 @@
 	<CMD state="Updater" type="push" body="$ ubimkvol /dev/ubi0 -Nrootfs -m"/>
 	<CMD state="Updater" type="push" body="$ mkdir -p /mnt/mtd%part_rootfs%"/>
 	<CMD state="Updater" type="push" body="$ mount -t ubifs ubi0:rootfs /mnt/mtd%part_rootfs%"/>
-	
 	<CMD state="Updater" type="push" body="pipe tar -jxv -C /mnt/mtd%part_rootfs%" file="files/%rootfs%" ifdev="MX6UL">Sending and writting rootfs</CMD>
 	<CMD state="Updater" type="push" body="pipe tar -jxv -C /mnt/mtd%part_rootfs%" file="files/%rootfs%" ifdev="MX6ULL">Sending and writting rootfs</CMD>
 	<CMD state="Updater" type="push" body="frf">Finishing rootfs write</CMD>
+	
+	<!--burn sn.txt file to /userapp/ directory -->
+	<CMD state="Updater" type="push" body="send" file="files/sn.txt" ifdev="MX6UL">Sending sn file</CMD>
+	<CMD state="Updater" type="push" body="send" file="files/sn.txt" ifdev="MX6ULL">Sending sn file</CMD>
+	<CMD state="Updater" type="push" body="$ cp $FILE /mnt/mtd%part_rootfs%/userapp/sn.txt" ifdev="MX6UL">write sn file</CMD>
+	<CMD state="Updater" type="push" body="$ cp $FILE /mnt/mtd%part_rootfs%/userapp/sn.txt" ifdev="MX6ULL">write sn file</CMD>
+	
 	<CMD state="Updater" type="push" body="$ umount /mnt/mtd%part_rootfs%">Unmounting rootfs partition</CMD>
 
 	<CMD state="Updater" type="push" body="$ echo Update Complete!">Done</CMD>
